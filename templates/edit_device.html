@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Device - Device Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2 class="mb-4">Edit Device</h2>
+  <form method="POST" action="{{ url_for('edit_device', device_id=device.id) }}">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      <label class="form-label">Device Name</label>
+      {{ form.name(class="form-control", value=device.name) }}
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Serial Number</label>
+      {{ form.serial_number(class="form-control", value=device.serial_number) }}
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">OS Version</label>
+      {{ form.os_version(class="form-control", value=device.os_version) }}
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Changes</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

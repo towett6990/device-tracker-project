@@ -1,0 +1,15 @@
+Flask==3.1.1
+Flask-Login==0.6.3
+Flask-Migrate==4.1.0
+Flask-Session==0.8.0
+Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.2
+gunicorn==23.0.0
+SQLAlchemy==2.0.41
+stripe==12.4.0
+python-dotenv==1.0.0
+requests==2.32.4
+geocoder==1.38.1
+geopy==2.4.1
+python-nmap==0.7.1
+psutil==7.0.0

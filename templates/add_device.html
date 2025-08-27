@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+
+      <!-- Card -->
+      <div class="card bg-dark text-white shadow-lg rounded-3 border-0">
+        <div class="card-header text-center border-0 bg-secondary rounded-top-3">
+          <h3 class="mb-0">➕ Add New Device</h3>
+        </div>
+        <div class="card-body">
+
+          <!-- Flash messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <!-- Form -->
+          <form method="POST" action="{{ url_for('add_device') }}">
+            <div class="mb-3">
+              <label for="serial_number" class="form-label">Serial Number <span class="text-danger">*</span></label>
+              <input type="text" class="form-control bg-dark text-white border-secondary" id="serial_number" name="serial_number" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="name" class="form-label">Device Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control bg-dark text-white border-secondary" id="name" name="name" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="make" class="form-label">Make <span class="text-danger">*</span></label>
+              <input type="text" class="form-control bg-dark text-white border-secondary" id="make" name="make" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="model" class="form-label">Model <span class="text-danger">*</span></label>
+              <input type="text" class="form-control bg-dark text-white border-secondary" id="model" name="model" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="device_type" class="form-label">Device Type</label>
+              <input type="text" class="form-control bg-dark text-white border-secondary" id="device_type" name="device_type" placeholder="e.g., Laptop, Phone, Router">
+            </div>
+
+            <div class="mb-3">
+              <label for="current_status" class="form-label">Current Status</label>
+              <select class="form-select bg-dark text-white border-secondary" id="current_status" name="current_status">
+                <option value="active" selected>Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="lost">Lost</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="current_location" class="form-label">Current Location</label>
+              <input type="text" class="form-control bg-dark text-white border-secondary" id="current_location" name="current_location" placeholder="Office / Warehouse / Remote">
+            </div>
+
+            <div class="mb-3">
+              <label for="os_version" class="form-label">OS Version</label>
+              <input type="text" class="form-control bg-dark text-white border-secondary" id="os_version" name="os_version" placeholder="Windows 11 / iOS 17 / Ubuntu 22.04">
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg rounded-3 shadow-sm">💾 Save Device</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

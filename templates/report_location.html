@@ -1,0 +1,23 @@
+@app.route('/api/report_location', methods=['POST'])
+def report_location():
+    data = request.get_json()
+    serial = data.get('serial_number')
+    lat = data.get('latitude')
+    lon = data.get('longitude')
+
+    device = Device.query.filter_by(serial_number=serial).first()
+    if not device:
+        return jsonify({'error': 'Device not found'}), 404
+
+    # 🧠 Movement detection
+    moved = device.latitude != lat or device.longitude != lon
+
+    device.latitude = lat
+    device.longitude = lon
+    device.last_seen = datetime.utcnow()
+    db.session.commit()
+
+    if moved:
+        print(f"⚠️ ALERT: {serial} has moved to ({lat}, {lon})")
+
+    return jsonify({'message': 'Location updated', 'movement_detected': moved}), 200

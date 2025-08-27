@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-3 text-light">Device List 📋</h2>
+
+  <table class="table table-dark table-hover table-striped align-middle shadow-lg rounded">
+    <thead class="thead-dark">
+      <tr>
+        <th>Serial Number</th>
+        <th>Status</th>
+        <th>Location</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th>Last Seen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for device in devices %}
+      <tr>
+        <td class="fw-bold">
+          <a href="{{ url_for('live_map', serial_number=device.serial_number) }}" class="text-decoration-none text-info">
+            {{ device.serial_number }}
+          </a>
+        </td>
+        <td>
+          {% if device.current_status == 'Active' %}
+            <span class="badge bg-success">🟢 Active</span>
+          {% elif device.current_status == 'Lost' %}
+            <span class="badge bg-danger">🔴 Lost</span>
+          {% elif device.current_status == 'Inactive' %}
+            <span class="badge bg-secondary">⚪ Inactive</span>
+          {% else %}
+            <span class="badge bg-warning text-dark">🟡 Unknown</span>
+          {% endif %}
+        </td>
+        <td>{{ device.current_location }}</td>
+        <td>{{ device.latitude or 'N/A' }}</td>
+        <td>{{ device.longitude or 'N/A' }}</td>
+        <td>{{ device.last_seen.strftime('%Y-%m-%d %H:%M:%S') if device.last_seen else 'Never' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .table {
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+  .badge {
+    font-size: 0.9rem;
+    padding: 0.4em 0.6em;
+  }
+  body {
+    background-color: #121212;
+    color: white;
+  }
+</style>
+{% endblock %}

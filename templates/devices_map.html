@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-center mb-4">🗺️ Device Map - {{ device.name }}</h1>
+
+  <!-- Device Info -->
+  <div class="mb-3">
+    <p><b>Serial Number:</b> {{ device.serial_number }}</p>
+    <p><b>Status:</b> {{ device.current_status }}</p>
+    <p><b>Location:</b> {{ device.current_location }}</p>
+    <p><b>Last Seen:</b> {{ device.last_seen.strftime('%Y-%m-%d %H:%M:%S') if device.last_seen else 'Never' }}</p>
+  </div>
+
+  <!-- Map Container -->
+  <div id="deviceMap" style="height: 500px; width: 100%;" class="rounded shadow mb-3"></div>
+
+  <!-- Controls -->
+  <div class="d-flex justify-content-between mb-4">
+    <button id="toggleTrail" class="btn btn-secondary">🔄 Toggle Trail</button>
+    <span class="text-muted">Last Update: <span id="lastUpdate">Never</span></span>
+  </div>
+
+  <!-- Alert Sound -->
+  <audio id="alertSound" src="{{ url_for('static', filename='alert.mp3') }}" preload="auto"></audio>
+</div>
+
+<!-- Leaflet.js -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+const map = L.map("deviceMap").setView([{{ device.latitude or 0 }}, {{ device.longitude or 0 }}], 13);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "&copy; OpenStreetMap contributors"
+}).addTo(map);
+
+let marker;
+let trail;
+let trailEnabled = true;
+let firstLoad = true;
+
+async function fetchDeviceLocation() {
+  try {
+    const response = await fetch(`/api/device_location/{{ device.serial_number }}`);
+    const data = await response.json();
+
+    if (!data.latitude || !data.longitude) return;
+
+    const latlng = [data.latitude, data.longitude];
+    const popupContent = `
+      <b>{{ device.name }}</b><br>
+      Serial: {{ device.serial_number }}<br>
+      Status: {{ device.current_status }}<br>
+      Last Seen: ${data.last_seen || 'Never'}
+    `;
+
+    if (marker) {
+      marker.setLatLng(latlng).setPopupContent(popupContent);
+      if (trailEnabled && trail) trail.addLatLng(latlng);
+      document.getElementById("alertSound").play();
+    } else {
+      marker = L.circleMarker(latlng, { radius: 8, color: "blue" }).addTo(map).bindPopup(popupContent);
+      trail = L.polyline([latlng], { color: "blue" }).addTo(map);
+    }
+
+    if (firstLoad) {
+      map.setView(latlng, 13);
+      firstLoad = false;
+    }
+
+    document.getElementById("lastUpdate").innerText = new Date().toLocaleTimeString();
+  } catch (err) {
+    console.error("Error fetching device location:", err);
+  }
+}
+
+// Auto-refresh every 3 seconds
+setInterval(fetchDeviceLocation, 3000);
+
+// Toggle trail visibility
+document.getElementById("toggleTrail").addEventListener("click", () => {
+  trailEnabled = !trailEnabled;
+  if (trail) {
+    if (trailEnabled) trail.addTo(map);
+    else map.removeLayer(trail);
+  }
+});
+
+// Initial fetch
+fetchDeviceLocation();
+</script>
+{% endblock %}
